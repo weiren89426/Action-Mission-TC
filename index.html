@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>代號 TC - 舊城重組行動</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="game-container">
+      <section id="start-screen" class="screen">
+        <div class="figma-canvas">
+          <button id="start-btn">開始遊戲</button>
+        </div>
+      </section>
+    </div>
+
+    <section id="notice-screen" class="screen hidden">
+      <div class="notice-content">
+        <h2>注意事項</h2>
+        <hr class="divider" />
+
+        <p>
+          為了配合場館開放時間，<br />建議遊玩時間為
+          <strong>09:00～18:00</strong>。
+        </p>
+
+        <p>
+          現場工作人員不知道這個遊戲，<br />因此對於謎題完全不了解，<br />無法提供相關答案。
+        </p>
+
+        <p>
+          另外，<br />遊玩時請避免低頭行走，<br />請隨時注意周遭狀況，<br />確認安全後，再進行遊玩。
+        </p>
+
+        <p>祝 玩得愉快～</p>
+      </div>
+
+      <button id="next-btn">下一步</button>
+    </section>
+    <section id="intro-screen" class="screen hidden">
+      <div class="figma-canvas intro-canvas">
+        <img src="images/bing_介紹.png" alt="餅太" class="intro-character" />
+
+        <div class="intro-text">
+          <p>開始遊戲前，<br />由我餅太來介紹一下<br />遊戲畫面如何操作吧～</p>
+        </div>
+
+        <button id="intro-btn">開始介紹</button>
+      </div>
+    </section>
+
+    <section id="tutorial-step1-screen" class="screen hidden">
+      <div class="figma-canvas tutorial-canvas">
+        <img src="images/bing_介紹.png" alt="餅太" class="tutorial-character" />
+
+        <div class="tutorial-text-group">
+          <p class="step-indicator">1 / 2</p>
+          <p>在我們跟你對話的時候，<br />點擊對話框可以查看下一句喔。</p>
+
+          <button id="tutorial-next-btn">下一步</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="tutorial-step2-screen" class="screen hidden">
+      <div class="figma-canvas tutorial-canvas-2">
+        <img src="images/bing_介紹.png" alt="餅太" class="tutorial-character" />
+
+        <div class="tutorial-text-group">
+          <p class="step-indicator">2 / 2</p>
+          <p>右上角有 「上一步」 按鈕，<br />點擊可以重新再看一次上一句喔～</p>
+
+          <button id="tutorial-finish-btn">開始遊戲</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="prologue-screen" class="screen hidden">
+      <div class="figma-canvas prologue-canvas">
+        <div class="prologue-text">
+          <p>在 2123 年，<br />有一個機構叫「時光修復局」，</p>
+          <p>這個機構專門回到過去，<br />去紀錄與維護人類的文化記憶。</p>
+        </div>
+
+        <button id="prologue-next-btn">▶</button>
+      </div>
+    </section>
+
+    <section id="prologue-screen-2" class="screen hidden">
+      <div class="figma-canvas prologue-canvas">
+        <div class="prologue-text">
+          <p>某天，</p>
+          <p>
+            時光修復局內部的其中一個小隊，<br />準備回到過去完成日常的任務...
+          </p>
+        </div>
+
+        <button id="prologue-next-btn-2">▶</button>
+      </div>
+    </section>
+
+    <section id="dialogue-screen" class="screen hidden">
+      <div class="figma-canvas">
+        <img
+          id="dialogue-image"
+          src="images/前言對話_01.png"
+          alt="劇情對話"
+          style="width: 100%; height: 100%; object-fit: cover"
+        />
+      </div>
+    </section>
+
+    <section id="home-screen" class="screen hidden">
+      <div class="figma-canvas relative-canvas">
+        <img
+          id="home-bg-image"
+          src="images/首頁_01.png"
+          alt="關卡選擇"
+          style="width: 100%; height: 100%; object-fit: cover"
+        />
+
+        <div id="hitbox-menu" class="hitbox"></div>
+
+        <div id="hitbox-prev" class="hitbox"></div>
+
+        <div id="hitbox-next" class="hitbox"></div>
+
+        <div id="hitbox-play" class="hitbox"></div>
+
+        <div id="hitbox-achievement" class="hitbox"></div>
+
+        <div id="hitbox-badge" class="hitbox"></div>
+      </div>
+    </section>
+
+    <section id="ch1-task-screen" class="screen hidden">
+      <div class="figma-canvas relative-canvas">
+        <img
+          src="images/第一章_更樓_02.png"
+          alt="前往台中公園"
+          style="width: 100%; height: 100%; object-fit: cover"
+        />
+
+        <div id="hitbox-arrived" class="hitbox"></div>
+      </div>
+    </section>
+
+    <section id="ch1-dialogue-screen" class="screen hidden">
+      <div class="figma-canvas">
+        <img
+          id="ch1-dialogue-image"
+          src="images/第一章_更樓_03.png"
+          alt="第一章對話"
+          style="width: 100%; height: 100%; object-fit: cover"
+        />
+      </div>
+    </section>
+
+    <section id="ch1-task2-screen" class="screen hidden">
+      <div class="figma-canvas relative-canvas">
+        <img
+          src="images/第一章_更樓_08.png"
+          alt="前往更樓"
+          style="width: 100%; height: 100%; object-fit: cover"
+        />
+        <div id="hitbox-arrived-2" class="hitbox"></div>
+      </div>
+    </section>
+
+    <section id="ch1-dialogue2-screen" class="screen hidden">
+      <div class="figma-canvas">
+        <img
+          id="ch1-dialogue2-image"
+          src="images/第一章_更樓_09.png"
+          alt="更樓對話"
+          style="width: 100%; height: 100%; object-fit: cover"
+        />
+      </div>
+    </section>
+
+    <section id="ch1-question1-screen" class="screen hidden">
+      <div class="figma-canvas relative-canvas">
+        <img
+          src="images/第一章_更樓_15.png"
+          alt="問題"
+          style="width: 100%; height: 100%; object-fit: cover"
+        />
+
+        <div id="hitbox-hint-btn" class="hitbox"></div>
+
+        <div id="hitbox-opt-a" class="hitbox opt-hitbox"></div>
+        <div id="hitbox-opt-b" class="hitbox opt-hitbox"></div>
+        <div id="hitbox-opt-c" class="hitbox opt-hitbox"></div>
+        <div id="hitbox-opt-d" class="hitbox opt-hitbox"></div>
+      </div>
+    </section>
+
+    <section id="ch1-hint1-screen" class="screen hidden">
+      <div class="figma-canvas relative-canvas">
+        <img
+          src="images/第一章_更樓_16.png"
+          alt="提示"
+          style="width: 100%; height: 100%; object-fit: cover"
+        />
+        <div id="hitbox-close-hint" class="hitbox"></div>
+      </div>
+    </section>
+
+    <section id="ch1-wrong1-screen" class="screen hidden">
+      <div class="figma-canvas">
+        <img
+          src="images/第一章_更樓_50.png"
+          alt="答錯了"
+          style="width: 100%; height: 100%; object-fit: cover"
+        />
+      </div>
+    </section>
+
+    <section id="ch1-correct1-screen" class="screen hidden">
+      <div class="figma-canvas">
+        <img
+          src="images/第一章_更樓_17.png"
+          alt="答對了"
+          style="width: 100%; height: 100%; object-fit: cover"
+        />
+      </div>
+    </section>
+
+    <section id="ch1-dialogue3-screen" class="screen hidden">
+      <div class="figma-canvas">
+        <img
+          id="ch1-dialogue3-image"
+          src="images/第一章_更樓_17.png"
+          alt="對話三"
+          style="width: 100%; height: 100%; object-fit: cover"
+        />
+      </div>
+    </section>
+
+    <section id="ch1-question2-screen" class="screen hidden">
+      <div class="figma-canvas relative-canvas">
+        <img
+          src="images/第一章_更樓_22.png"
+          alt="問題二"
+          style="width: 100%; height: 100%; object-fit: cover"
+        />
+        <div id="q2-hint-btn" class="hitbox hint-btn-common"></div>
+        <div id="q2-opt-a" class="hitbox opt-hitbox opt-a-pos"></div>
+        <div id="q2-opt-b" class="hitbox opt-hitbox opt-b-pos"></div>
+        <div id="q2-opt-c" class="hitbox opt-hitbox opt-c-pos"></div>
+        <div id="q2-opt-d" class="hitbox opt-hitbox opt-d-pos"></div>
+      </div>
+    </section>
+
+    <section id="ch1-hint2-screen" class="screen hidden">
+      <div class="figma-canvas relative-canvas">
+        <img
+          src="images/第一章_更樓_23.png"
+          alt="提示二"
+          style="width: 100%; height: 100%; object-fit: cover"
+        />
+        <div id="q2-close-hint" class="hitbox close-hint-common"></div>
+      </div>
+    </section>
+
+    <section id="ch1-wrong2-screen" class="screen hidden">
+      <div class="figma-canvas">
+        <img
+          src="images/第一章_更樓_50.png"
+          alt="答錯"
+          style="width: 100%; height: 100%; object-fit: cover"
+        />
+      </div>
+    </section>
+
+    <section id="ch1-dialogue4-screen" class="screen hidden">
+      <div class="figma-canvas">
+        <img
+          id="ch1-dialogue4-image"
+          src="images/第一章_更樓_24.png"
+          alt="對話四"
+          style="width: 100%; height: 100%; object-fit: cover"
+        />
+      </div>
+    </section>
+
+    <section id="ch1-question3-screen" class="screen hidden">
+      <div class="figma-canvas relative-canvas">
+        <img
+          src="images/第一章_更樓_33.png"
+          alt="問題三"
+          style="width: 100%; height: 100%; object-fit: cover"
+        />
+        <div id="q3-hint-btn" class="hitbox hint-btn-common"></div>
+        <div id="q3-opt-a" class="hitbox opt-hitbox opt-a-pos"></div>
+        <div id="q3-opt-b" class="hitbox opt-hitbox opt-b-pos"></div>
+        <div id="q3-opt-c" class="hitbox opt-hitbox opt-c-pos"></div>
+        <div id="q3-opt-d" class="hitbox opt-hitbox opt-d-pos"></div>
+      </div>
+    </section>
+
+    <section id="ch1-hint3-screen" class="screen hidden">
+      <div class="figma-canvas relative-canvas">
+        <img
+          src="images/第一章_更樓_34.png"
+          alt="提示三"
+          style="width: 100%; height: 100%; object-fit: cover"
+        />
+        <div id="q3-close-hint" class="hitbox close-hint-common"></div>
+      </div>
+    </section>
+
+    <section id="ch1-wrong3-screen" class="screen hidden">
+      <div class="figma-canvas">
+        <img
+          src="images/第一章_更樓_50.png"
+          alt="答錯"
+          style="width: 100%; height: 100%; object-fit: cover"
+        />
+      </div>
+    </section>
+
+    <section id="ch1-dialogue5-screen" class="screen hidden">
+      <div class="figma-canvas">
+        <img
+          id="ch1-dialogue5-image"
+          src="images/第一章_更樓_35.png"
+          alt="對話五"
+          style="width: 100%; height: 100%; object-fit: cover"
+        />
+      </div>
+    </section>
+
+    <section id="ch1-question4-screen" class="screen hidden">
+      <div class="figma-canvas relative-canvas">
+        <img
+          src="images/第一章_更樓_40.png"
+          alt="問題四"
+          style="width: 100%; height: 100%; object-fit: cover"
+        />
+        <div id="q4-hint-btn" class="hitbox hint-btn-common"></div>
+        <div id="q4-opt-a" class="hitbox opt-hitbox opt-a-pos"></div>
+        <div id="q4-opt-b" class="hitbox opt-hitbox opt-b-pos"></div>
+        <div id="q4-opt-c" class="hitbox opt-hitbox opt-c-pos"></div>
+        <div id="q4-opt-d" class="hitbox opt-hitbox opt-d-pos"></div>
+      </div>
+    </section>
+
+    <section id="ch1-hint4-screen" class="screen hidden">
+      <div class="figma-canvas relative-canvas">
+        <img
+          src="images/第一章_更樓_41.png"
+          alt="提示四"
+          style="width: 100%; height: 100%; object-fit: cover"
+        />
+        <div id="q4-close-hint" class="hitbox close-hint-common"></div>
+      </div>
+    </section>
+
+    <section id="ch1-wrong4-screen" class="screen hidden">
+      <div class="figma-canvas">
+        <img
+          src="images/第一章_更樓_50.png"
+          alt="答錯"
+          style="width: 100%; height: 100%; object-fit: cover"
+        />
+      </div>
+    </section>
+
+    <section id="ch1-dialogue6-screen" class="screen hidden">
+      <div class="figma-canvas">
+        <img
+          id="ch1-dialogue6-image"
+          src="images/第一章_更樓_42.png"
+          alt="對話六"
+          style="width: 100%; height: 100%; object-fit: cover"
+        />
+      </div>
+    </section>
+
+    <section id="ch1-badge1-screen" class="screen hidden">
+      <div class="figma-canvas relative-canvas">
+        <img
+          src="images/第一章_更樓_48.png"
+          alt="獲得更樓徽章"
+          style="width: 100%; height: 100%; object-fit: cover"
+        />
+        <div id="hitbox-continue-1" class="hitbox"></div>
+      </div>
+    </section>
+
+    <section id="ch1-task3-screen" class="screen hidden">
+      <div class="figma-canvas relative-canvas">
+        <img
+          src="images/第一章_更樓_49.png"
+          alt="前往鳥居"
+          style="width: 100%; height: 100%; object-fit: cover"
+        />
+        <div id="hitbox-arrived-3" class="hitbox"></div>
+      </div>
+    </section>
+
+    <script src="script.js"></script>
+  </body>
+</html>

@@ -1,0 +1,762 @@
+/* 1. 全域初始化：清除瀏覽器預設的邊距，並禁止文字被選取（避免玩家按鈕按太快選到文字） */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-user-select: none; /* 針對 Safari 的防文字選取 */
+}
+
+/* 2. 讓網頁背景變成黑色，這在載入時比較有質感 */
+body {
+  background-color: #000000;
+  /* 隱藏原生瀏覽器的捲動條，避免破壞遊戲體驗 */
+  overflow: hidden;
+}
+
+/* 3. 遊戲總容器：這就是你 Figma 裡的 Frame */
+#game-container {
+  width: 100vw; /* 寬度：永遠是螢幕的 100% (對應你的 390) */
+  height: 100dvh; /* 高度：動態視窗高度 100% (自動扣除網址列，對應你的 694 安全區) */
+  position: relative;
+  overflow: hidden; /* 超出這個範圍的東西全部隱藏 */
+
+  /* 這裡可以放你從 Figma 匯出的滿版背景圖 */
+  background-image: url("images/bg_home.jpg");
+  background-size: cover; /* 讓圖片等比例縮放填滿 */
+  background-position: center; /* 圖片保持置中 */
+}
+
+/* 4. 畫面類別：未來用來切換不同頁面用的基礎設定 */
+.screen {
+  width: 100%;
+  height: 100%;
+  position: absolute; /* 讓所有畫面疊在一起 */
+  top: 0;
+  left: 0;
+}
+
+/* 5. 隱藏類別：JavaScript 會用到它來切換畫面 */
+.hidden {
+  display: none !important;
+}
+
+#start-screen {
+  background-color: #ffffff;
+  display: flex;
+  justify-content: center; /* 左右置中 */
+  align-items: center; /* 上下置中 (產生你想要的白邊) */
+
+  width: 100vw;
+  /* dvh 單位最神奇的地方，就是它會「自動偵測並預留」手機原生的網址列空間！ */
+  height: 100dvh;
+}
+
+/* 2. 終極隱形畫布：完全模擬 Figma 的 Frame 比例與行為 */
+.figma-canvas {
+  position: relative;
+
+  /* 鎖定你的 Figma 設計尺寸比例 */
+  aspect-ratio: 390 / 694;
+
+  /* 防跑版魔法公式： */
+  width: 100%; /* 優先讓寬度放大到滿版 */
+  max-height: 100dvh; /* 絕對不允許畫布高度超過螢幕 (避免出現捲動條) */
+
+  /* 當手機太短時，強制縮小寬度來配合高度，確保圖片絕不裁切 */
+  max-width: calc(100dvh * (390 / 694));
+
+  /* 因為畫布比例被我們完美鎖死了，現在用 cover 絕對不會切到圖片！ */
+  background-image: url("images/0.0_start.png");
+  background-size: cover;
+  background-position: center;
+}
+
+/* 3. 按鈕：現在它會死死咬住圖片的像素，絕不錯位 */
+#start-btn {
+  position: absolute;
+  /* 這裡的 % 數是根據「圖片」的高度來算的。你可以微調這個數字，精準對準預留的空位 */
+  bottom: 14%;
+  left: 50%;
+  transform: translateX(-50%);
+
+  /* -- 下面是你設計好的按鈕樣式 (無變動) -- */
+  width: 220px;
+  height: 46px;
+  background-color: rgba(255, 212, 100, 0.9);
+  color: #000000;
+  font-family: "PingFang TC", "Microsoft JhengHei", sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: none;
+  border-radius: 23px;
+  box-shadow: 0px 0px 10px rgba(255, 212, 100, 0.9);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+#start-btn:active {
+  transform: translateX(-50%) scale(0.96);
+  background-color: rgba(255, 212, 100, 1);
+}
+/* --- 畫面二：注意事項排版 --- */
+#notice-screen {
+  background-color: #f5f5f5; /* 淺灰背景 */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100dvh;
+}
+
+/* 文字區塊：初始設定為透明 (opacity: 0)，交給動畫來浮現 */
+.notice-content {
+  text-align: center;
+  color: #333333;
+  font-family: "PingFang TC", "Microsoft JhengHei", sans-serif;
+
+  /* 啟動動畫：播放 fadeIn 動畫，花費 1.2 秒，播完後停留在最終狀態 (forwards) */
+  opacity: 0;
+  animation: fadeIn 1.2s ease forwards;
+}
+
+.notice-content h2 {
+  font-size: 18px;
+  letter-spacing: 2px;
+  font-weight: normal;
+  margin-bottom: 8px;
+}
+
+/* 標題下方的小橫線 */
+.divider {
+  width: 30px;
+  border: 0;
+  border-top: 1px solid #999;
+  margin: 0 auto 30px auto;
+}
+
+.notice-content p {
+  font-size: 14px;
+  line-height: 2; /* 讓行距稍微拉開，閱讀更舒適 */
+  margin-bottom: 24px;
+  letter-spacing: 1px;
+}
+
+/* --- 下一步按鈕 --- */
+#next-btn {
+  position: absolute;
+  bottom: 18%; /* 保持跟上一頁的按鈕在同一個高度，切換時視覺最流暢 */
+
+  width: 220px;
+  height: 46px;
+  background-color: rgba(255, 212, 100, 0.9);
+  color: #000000;
+  font-family: "PingFang TC", "Microsoft JhengHei", sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  border: none;
+  border-radius: 23px;
+  box-shadow: 0px 0px 10px rgba(255, 212, 100, 0.9);
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  /* 啟動動畫：跟文字一樣的淡入效果，但『延遲 1.5 秒』才開始播 */
+  opacity: 0;
+  animation: fadeIn 1s ease forwards;
+  animation-delay: 1.5s;
+}
+
+#next-btn:active {
+  transform: scale(0.96);
+  background-color: rgba(255, 212, 100, 1);
+}
+
+/* --- 定義共用的淡入動畫 (Keyframes) --- */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px); /* 從稍微下面一點點的地方往上升 */
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0); /* 回到原本的位置 */
+  }
+}
+
+/* --- 畫面三：操作介紹排版 --- */
+#intro-screen {
+  background-color: #f5f5f5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100dvh;
+}
+
+/* 覆寫畫布設定，移除第一頁的開場背景圖 */
+.intro-canvas {
+  background-image: none !important;
+  background-color: transparent;
+}
+
+/* 餅太角色：固定在畫布左側，加入「從左邊探出頭」的滑入動畫 */
+.intro-character {
+  position: absolute;
+  left: 0%; /* 依據你的切圖邊緣可以微調這個數字 (-5% 到 -10% 之間) */
+  bottom: 20%;
+  width: 30%; /* 餅太的大小比例 */
+
+  /* 動畫設定：一開始先隱藏，然後花 0.8 秒滑進來 */
+  opacity: 0;
+  animation: slideInLeft 0.8s ease forwards;
+}
+
+/* 介紹文字：固定在角色右邊 */
+.intro-text {
+  position: absolute;
+  left: 33%;
+  bottom: 30%;
+  color: #333333;
+  font-family: "PingFang TC", "Microsoft JhengHei", sans-serif;
+  font-size: 15px;
+  line-height: 1.8;
+  letter-spacing: 1px;
+
+  /* 動畫設定：延遲 0.6 秒，等餅太出來後才淡入 */
+  opacity: 0;
+  animation: fadeIn 0.8s ease forwards;
+  animation-delay: 0.6s;
+}
+
+/* 開始介紹按鈕 (沿用你設計的完美膠囊樣式) */
+#intro-btn {
+  position: absolute;
+  bottom: 18%;
+  left: 25%;
+  transform: translateX(-50%);
+
+  width: 220px;
+  height: 46px;
+  background-color: rgba(255, 212, 100, 0.9);
+  color: #000000;
+  font-family: "PingFang TC", "Microsoft JhengHei", sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  border: none;
+  border-radius: 23px;
+  box-shadow: 0px 0px 10px rgba(255, 212, 100, 0.9);
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  /* 動畫設定：延遲 1.5 秒，等文字讀完後才出現，引導玩家點擊 */
+  opacity: 0;
+  animation: fadeIn 0.8s ease forwards;
+  animation-delay: 1.5s;
+}
+
+#intro-btn:active {
+  transform: translateX(-50%) scale(0.96);
+  background-color: rgba(255, 212, 100, 1);
+}
+
+/* --- 新增：從左側滑入的專屬動畫 (Keyframes) --- */
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* --- 畫面四：操作介紹 Step 1 排版 --- */
+#tutorial-step1-screen {
+  background-color: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100dvh;
+}
+
+/* 放入你匯出的對話介面底圖 */
+.tutorial-canvas {
+  background-image: url("images/介紹_1.png");
+  background-size: cover;
+  background-position: center;
+}
+
+/* 餅太角色：沿用之前的動畫，但位置稍微拉高一點，配合這頁的視覺 */
+.tutorial-character {
+  position: absolute;
+  left: 0%;
+  bottom: 40%;
+  width: 30%;
+  z-index: 2;
+  opacity: 0;
+  animation: slideInLeft 0.8s ease forwards;
+}
+
+/* 教學文字與按鈕群組 */
+.tutorial-text-group {
+  position: absolute;
+  left: 35%;
+  bottom: 45%;
+  color: #ffffff; /* 因為背景變暗了，文字改成白色 */
+  font-family: "PingFang TC", "Microsoft JhengHei", sans-serif;
+  font-size: 15px;
+  line-height: 1.8;
+  letter-spacing: 1px;
+  z-index: 2;
+
+  opacity: 0;
+  animation: fadeIn 0.8s ease forwards;
+  animation-delay: 0.6s;
+}
+
+/* 步驟數字的小點綴 */
+.step-indicator {
+  font-size: 13px;
+  color: #ffd464; /* 用黃色凸顯進度 */
+  margin-bottom: 4px;
+}
+
+/* 這次的小尺寸下一步按鈕 */
+#tutorial-next-btn {
+  margin-top: 16px; /* 跟上面的文字拉開一點距離 */
+  width: 100px; /* 縮短按鈕寬度 */
+  height: 32px; /* 降低按鈕高度 */
+  background-color: rgba(255, 212, 100, 0.9);
+  color: #000000;
+  font-family: "PingFang TC", "Microsoft JhengHei", sans-serif;
+  font-size: 14px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  border: none;
+  border-radius: 16px; /* 膠囊圓角 (高度的一半) */
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+#tutorial-next-btn:active {
+  transform: scale(0.96);
+  background-color: rgba(255, 212, 100, 1);
+}
+
+/* --- 畫面五：操作介紹 Step 2 排版 --- */
+#tutorial-step2-screen {
+  background-color: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100dvh;
+}
+
+/* 放入你第二張對話介面底圖 (已自帶遮罩) */
+.tutorial-canvas-2 {
+  /* 這裡記得換成你實際上傳的背景圖檔名喔！ */
+  background-image: url("images/介紹_2.png");
+  background-size: cover;
+  background-position: center;
+}
+
+/* 2/2 的「開始遊戲」按鈕 (樣式跟 1/2 完全一樣) */
+#tutorial-finish-btn {
+  margin-top: 16px;
+  width: 100px;
+  height: 32px;
+  background-color: rgba(255, 212, 100, 0.9);
+  color: #000000;
+  font-family: "PingFang TC", "Microsoft JhengHei", sans-serif;
+  font-size: 14px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  border: none;
+  border-radius: 16px; /* 膠囊圓角 */
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+#tutorial-finish-btn:active {
+  transform: scale(0.96);
+  background-color: rgba(255, 212, 100, 1);
+}
+
+/* --- 畫面六：前言故事排版 --- */
+#prologue-screen {
+  background-color: #000000; /* 換成全黑底色，增加科幻電影感 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100dvh;
+}
+
+/* 放入前言背景圖 */
+.prologue-canvas {
+  background-image: url("images/前言_背景.png");
+  background-size: cover;
+  background-position: center;
+}
+
+/* 故事文字設定 */
+.prologue-text {
+  position: absolute;
+  top: 35%;
+  left: 3%;
+
+  /* 就是這行魔法！請確保有 transform 且裡面是 -50% */
+  transform: translate(-50%, -50%);
+
+  width: 100%; /* 這裡我幫你改成 100%，確保它絕對有足夠的寬度置中 */
+  text-align: center;
+  color: #ffffff;
+  font-family: "PingFang TC", "Microsoft JhengHei", sans-serif;
+  font-size: 15px;
+  line-height: 2.2;
+  letter-spacing: 2px;
+
+  opacity: 0;
+  animation: fadeIn 1.5s ease forwards;
+  animation-delay: 0.5s;
+}
+
+/* 讓兩個段落之間有一點距離 */
+.prologue-text p {
+  margin-bottom: 28px;
+}
+
+/* 右下角的下一步三角形 */
+#prologue-next-btn {
+  position: absolute;
+  right: 8%;
+  bottom: 12%;
+  background: none;
+  border: none;
+  color: #ffffff;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 10px; /* 增加點擊範圍 */
+
+  /* 淡入效果：比文字晚一點出現，引導玩家點擊 */
+  opacity: 0;
+  animation: fadeIn 1s ease forwards;
+  animation-delay: 2.5s;
+  transition: all 0.2s ease;
+}
+
+#prologue-next-btn:active {
+  transform: scale(0.8);
+  color: #ffd464; /* 按下去時變成主題黃色，給予回饋感 */
+}
+
+/* --- 畫面七：前言故事排版2 --- */
+#prologue-screen-2 {
+  background-color: #000000; /* 換成全黑底色，增加科幻電影感 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100dvh;
+}
+
+/* 放入前言背景圖 */
+.prologue-canvas {
+  background-image: url("images/前言_背景.png");
+  background-size: cover;
+  background-position: center;
+}
+
+/* 故事文字設定 */
+.prologue-text {
+  position: absolute;
+  top: 35%;
+  left: 3%;
+
+  /* 就是這行魔法！請確保有 transform 且裡面是 -50% */
+  transform: translate(-50%, -50%);
+
+  width: 100%; /* 這裡我幫你改成 100%，確保它絕對有足夠的寬度置中 */
+  text-align: center;
+  color: #ffffff;
+  font-family: "PingFang TC", "Microsoft JhengHei", sans-serif;
+  font-size: 15px;
+  line-height: 2.2;
+  letter-spacing: 2px;
+
+  opacity: 0;
+  animation: fadeIn 1.5s ease forwards;
+  animation-delay: 0.5s;
+}
+
+/* 讓兩個段落之間有一點距離 */
+.prologue-text p {
+  margin-bottom: 28px;
+}
+
+/* 右下角的下一步三角形 */
+#prologue-next-btn-2 {
+  position: absolute;
+  right: 8%;
+  bottom: 12%;
+  background: none;
+  border: none;
+  color: #ffffff;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 10px; /* 增加點擊範圍 */
+
+  /* 淡入效果：比文字晚一點出現，引導玩家點擊 */
+  opacity: 0;
+  animation: fadeIn 1s ease forwards;
+  animation-delay: 2.5s;
+  transition: all 0.2s ease;
+}
+
+#prologue-next-btn-2:active {
+  transform: scale(0.8);
+  color: #ffd464; /* 按下去時變成主題黃色，給予回饋感 */
+}
+
+/* --- 畫面八：劇情輪播區 --- */
+#dialogue-screen {
+  background-color: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100dvh;
+}
+
+/* --- 遊戲首頁：透明熱區排版 --- */
+#home-screen {
+  background-color: #ffffff; /* 如果手機太長，上下會補白底，也可以改成你喜歡的底色 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100dvh;
+}
+
+/* 核心魔法：強制拔除第一頁漏出來的背景圖檔 */
+.relative-canvas {
+  position: relative;
+  background-image: none !important;
+}
+
+/* 熱區共用設定 (紅框方便你對位置，對好後可以把 border 這行刪掉) */
+.hitbox {
+  position: absolute;
+  cursor: pointer;
+  z-index: 10;
+}
+
+/* 1. 右上角漢堡選單 */
+#hitbox-menu {
+  top: 2.5%;
+  right: 4%;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+}
+
+/* 2. 左側換關箭頭 */
+#hitbox-prev {
+  top: 19%;
+  left: 2%;
+  width: 50px;
+  height: 12%;
+}
+
+/* 3. 右側換關箭頭 */
+#hitbox-next {
+  top: 19%;
+  right: 2%;
+  width: 50px;
+  height: 12%;
+}
+
+/* 4. 中央 Play 按鈕 */
+#hitbox-play {
+  bottom: 4%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+}
+
+/* 新增 5. 左下角成就按鈕 */
+#hitbox-achievement {
+  bottom: 6%;
+  left: 7%;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+}
+
+/* 新增 6. 右下角徽章按鈕 */
+#hitbox-badge {
+  bottom: 6%;
+  right: 7%;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+}
+
+/* --- 第一章：任務抵達與對話畫面共用底色 --- */
+#ch1-task-screen,
+#ch1-dialogue-screen {
+  background-color: #ffffff; /* 讓背景偏暗，凸顯中間的白色卡片 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100dvh;
+}
+
+/* 第一章「已抵達」按鈕熱區 */
+#hitbox-arrived {
+  bottom: 19%; /* 根據你的圖片比例微調 */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 50px;
+  border-radius: 25px; /* 膠囊形狀 */
+}
+
+/* --- 任務二「已抵達」按鈕 (沿用剛剛的尺寸，微調位置) --- */
+#hitbox-arrived-2 {
+  bottom: 21%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 50px;
+  border-radius: 25px;
+}
+
+/* --- 問題畫面：右上角提示按鈕 --- */
+#hitbox-hint-btn {
+  top: 4%;
+  right: 4%;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+}
+
+/* --- 問題畫面：選項按鈕共用設定 --- */
+.opt-hitbox {
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70%; /* 涵蓋選項膠囊的寬度 */
+  height: 7%; /* 涵蓋選項膠囊的高度 */
+  border-radius: 25px;
+}
+
+/* 四個選項的垂直高度 (根據圖片比例抓取) */
+#hitbox-opt-a {
+  top: 43%;
+}
+#hitbox-opt-b {
+  top: 53%;
+}
+#hitbox-opt-c {
+  top: 62%;
+}
+#hitbox-opt-d {
+  top: 70%;
+}
+
+/* --- 提示畫面：下方的 X 關閉按鈕 --- */
+#hitbox-close-hint {
+  bottom: 18%; /* 根據你的截圖，X 在白底卡片的下方 */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+}
+
+/* ========================================== */
+/* 第一章：所有新畫面共用置中魔法與底色 */
+/* ========================================== */
+#ch1-task2-screen,
+#ch1-dialogue2-screen,
+#ch1-question1-screen,
+#ch1-hint1-screen,
+#ch1-wrong1-screen,
+#ch1-correct1-screen,
+#ch1-dialogue3-screen,
+#ch1-question2-screen,
+#ch1-hint2-screen,
+#ch1-wrong2-screen,
+#ch1-dialogue4-screen,
+#ch1-question3-screen,
+#ch1-hint3-screen,
+#ch1-wrong3-screen,
+#ch1-dialogue5-screen,
+#ch1-question4-screen,
+#ch1-hint4-screen,
+#ch1-wrong4-screen,
+#ch1-dialogue6-screen,
+#ch1-badge1-screen,
+#ch1-task3-screen {
+  background-color: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100dvh;
+}
+
+/* --- 提示按鈕與關閉按鈕 (共用位置) --- */
+.hint-btn-common {
+  top: 4%;
+  right: 4%;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+}
+.close-hint-common {
+  bottom: 18%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+}
+
+/* --- 所有問題的選項高度共用 --- */
+.opt-a-pos {
+  top: 43%;
+}
+.opt-b-pos {
+  top: 53%;
+}
+.opt-c-pos {
+  top: 62%;
+}
+.opt-d-pos {
+  top: 70%;
+}
+
+/* --- 徽章「繼續遊玩」與任務三「已抵達」共用底部膠囊按鈕位置 --- */
+#hitbox-continue-1,
+#hitbox-arrived-3 {
+  bottom: 21%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 50px;
+  border-radius: 25px;
+}
